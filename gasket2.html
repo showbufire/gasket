@@ -28,12 +28,21 @@ main()
 <script type="text/javascript" src="common/webgl-utils.js"></script>
 <script type="text/javascript" src="common/initShaders.js"></script>
 <script type="text/javascript" src="common/MV.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="gasket2.js"></script>
-</head>   
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+</head>
 
 <body>
-<canvas id="gl-canvas" width="512" height="512">
-Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
+  <div class="container">
+    <canvas id="gl-canvas" width="512" height="512">
+      Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+    <div class="input-group">
+      <label for="level">Level</label>
+      <input id="level" type="level" class="form-control" value="3" aria-label="tessellation_levl" />
+    </div>
+  </div>
 </body>
 </html>

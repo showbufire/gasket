@@ -4,20 +4,38 @@ var gl;
 
 var points = [];
 
-var NumTimesToSubdivide = 5;
+window.onload = function() {
+    initgl();
+    $("#level").change(function () {
+	redraw();
+    })
+    redraw();
+}
 
-window.onload = function init()
-{
+function initgl() {
     canvas = document.getElementById( "gl-canvas" );
     
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
-        
+    
     //
     //  Initialize our data for the Sierpinski Gasket
     //
 
     // First, initialize the corners of our gasket with three points.
+    //
+    //  Configure WebGL
+    //
+    gl.viewport( 0, 0, canvas.width, canvas.height );
+}
+
+function redraw() {
+    level = $("#level").val();
+    draw(parseInt(level));
+}
+
+function draw(level) {
+    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
     
     var vertices = [
         vec2( -1, -1 ),
@@ -25,21 +43,19 @@ window.onload = function init()
         vec2(  1, -1 )
     ];
 
-    divideTriangle( vertices[0], vertices[1], vertices[2],
-                    NumTimesToSubdivide);
+    points = []
+    divideTriangle(
+	vertices[0],
+	vertices[1],
+	vertices[2],
+        level);
 
-    //
-    //  Configure WebGL
-    //
-    gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
+    // Load the data into the GPU
 
     //  Load shaders and initialize attribute buffers
     
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
-
-    // Load the data into the GPU
     
     var bufferId = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
@@ -52,15 +68,13 @@ window.onload = function init()
     gl.enableVertexAttribArray( vPosition );
 
     render();
-};
+}
 
-function triangle( a, b, c )
-{
+function triangle( a, b, c ) {
     points.push( a, b, c );
 }
 
-function divideTriangle( a, b, c, count )
-{
+function divideTriangle( a, b, c, count ) {
 
     // check for end of recursion
     
