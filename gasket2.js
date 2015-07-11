@@ -6,9 +6,8 @@ var points = [];
 
 window.onload = function() {
     initgl();
-    $("#level").change(function () {
-	redraw();
-    })
+    $("#level").change(redraw);
+    $("#angle").change(redraw);
     redraw();
 }
 
@@ -31,24 +30,26 @@ function initgl() {
 
 function redraw() {
     level = $("#level").val();
-    draw(parseInt(level));
+    angle = $("#angle").val() / 360 * Math.PI;
+    draw(parseInt(level), angle);
 }
 
-function draw(level) {
+function draw(level, angle) {
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
     
     var vertices = [
-        vec2( -1, -1 ),
-        vec2(  0,  1 ),
-        vec2(  1, -1 )
+        vec2( -.7, -.7 ),
+        vec2(  0,  .7 ),
+        vec2(  .7, -.7 )
     ];
 
-    points = []
+    points = [];
     divideTriangle(
 	vertices[0],
 	vertices[1],
 	vertices[2],
-        level);
+        level,
+	angle);
 
     // Load the data into the GPU
 
@@ -70,16 +71,23 @@ function draw(level) {
     render();
 }
 
-function triangle( a, b, c ) {
-    points.push( a, b, c );
+function rotate(p, angle) {
+    d = Math.sqrt(p[0] * p[0] + p[1] * p[1]);
+    theta = angle * d
+    return vec2(p[0] * Math.cos(theta) - p[1] * Math.sin(theta),
+		p[0] * Math.sin(theta) + p[1] * Math.cos(theta));
 }
 
-function divideTriangle( a, b, c, count ) {
+function triangle( a, b, c, angle ) {
+    points.push( rotate(a, angle), rotate(b, angle), rotate(c, angle) );
+}
+
+function divideTriangle( a, b, c, count, angle ) {
 
     // check for end of recursion
     
     if ( count === 0 ) {
-        triangle( a, b, c );
+        triangle( a, b, c, angle );
     }
     else {
     
@@ -93,9 +101,9 @@ function divideTriangle( a, b, c, count ) {
 
         // three new triangles
         
-        divideTriangle( a, ab, ac, count );
-        divideTriangle( c, ac, bc, count );
-        divideTriangle( b, bc, ab, count );
+        divideTriangle( a, ab, ac, count, angle);
+        divideTriangle( c, ac, bc, count, angle);
+        divideTriangle( b, bc, ab, count, angle);
     }
 }
 
